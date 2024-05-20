@@ -2,3 +2,8 @@
 main
 clox
 obj
+
+
+# Added by cargo
+
+/target
