@@ -10,12 +10,11 @@ fn main() -> Result<(), ()> {
 
     let constant = chunk.add_constant(1.2);
 
-    chunk.write_op_code(OpCode::OpConstant);
-    chunk.write(constant.try_into().unwrap());
-    chunk.write_op_code(OpCode::OpReturn);
+    chunk.write_op_code(OpCode::OpConstant, 42);
+    chunk.write(constant.try_into().unwrap(), 42);
+    chunk.write_op_code(OpCode::OpReturn, 42);
 
     disassemble_chunk(&chunk, "test chunk");
-
 
     Ok(())
 }

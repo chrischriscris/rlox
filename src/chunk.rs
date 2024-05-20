@@ -21,6 +21,7 @@ impl TryFrom<u8> for OpCode {
 
 pub struct Chunk {
     pub code: Vec<u8>,
+    pub lines: Vec<u32>,
     pub constants: ValueArray,
 }
 
@@ -28,16 +29,18 @@ impl Chunk {
     pub fn new() -> Chunk {
         Chunk {
             code: Vec::new(),
+            lines: Vec::new(),
             constants: ValueArray::new(),
         }
     }
 
-    pub fn write(&mut self, byte: u8) {
+    pub fn write(&mut self, byte: u8, line: u32) {
         self.code.push(byte);
+        self.lines.push(line);
     }
 
-    pub fn write_op_code(&mut self, op_code: OpCode) {
-        self.write(op_code as u8);
+    pub fn write_op_code(&mut self, op_code: OpCode, line: u32) {
+        self.write(op_code as u8, line);
     }
 
     pub fn add_constant(&mut self, value: Value) -> usize {

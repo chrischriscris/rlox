@@ -1,7 +1,7 @@
 pub type Value = f64;
 
 pub fn print_value(value: Value) {
-    print!("{:e}", value);
+    print!("{}", value);
 }
 
 pub struct ValueArray {
