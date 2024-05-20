@@ -1,7 +1,11 @@
 pub type Value = f64;
 
+pub fn print_value(value: Value) {
+    print!("{:e}", value);
+}
+
 pub struct ValueArray {
-    values: Vec<Value>,
+    pub values: Vec<Value>,
 }
 
 impl ValueArray {

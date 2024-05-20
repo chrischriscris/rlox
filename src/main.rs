@@ -10,8 +10,9 @@ fn main() -> Result<(), ()> {
 
     let constant = chunk.add_constant(1.2);
 
-    chunk.write(OpCode::OpConstant);
-    chunk.write(OpCode::OpReturn);
+    chunk.write_op_code(OpCode::OpConstant);
+    chunk.write(constant.try_into().unwrap());
+    chunk.write_op_code(OpCode::OpReturn);
 
     disassemble_chunk(&chunk, "test chunk");
 
