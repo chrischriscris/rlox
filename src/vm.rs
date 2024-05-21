@@ -25,20 +25,10 @@ impl<'a> VM<'a> {
 
     pub fn run(&mut self) -> InterpretResult {
         loop {
-
             let instruction = match self.read_byte() {
                 Some(value) => OpCode::try_from(value),
                 None => return InterpretResult::Ok,
             };
-
-            if self.chunk.is_none() {
-                return InterpretResult::Ok;
-            }
-
-            let instruction = OpCode::try_from(self.read_byte());
-            if let Err(_) = instruction {
-                return InterpretResult::CompileError;
-            }
 
             return match instruction.unwrap() {
                 OpCode::OpReturn => InterpretResult::Ok,
