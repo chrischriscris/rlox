@@ -17,7 +17,8 @@ fn main() -> Result<(), ()> {
     chunk.write(constant.try_into().unwrap(), 42);
     chunk.write_op_code(OpCode::OpReturn, 42);
 
-    disassemble_chunk(&chunk, "test chunk");
+    // disassemble_chunk(&chunk, "test chunk");
+    vm.interpret(&chunk);
 
     Ok(())
 }
