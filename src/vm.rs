@@ -25,6 +25,12 @@ impl<'a> VM<'a> {
 
     fn run(&mut self) -> InterpretResult {
         loop {
+            #[cfg(feature = "debug_trace_execution")]
+            {
+                print!("hola");
+                // disassemble_instruction(self.chunk.unwrap(), self.ip);
+            }
+
             let instruction = match self.read_byte() {
                 Some(value) => OpCode::try_from(value),
                 None => return InterpretResult::Ok,
@@ -35,7 +41,7 @@ impl<'a> VM<'a> {
                     let constant = self.read_constant();
                     println!("{}", constant);
 
-                    break InterpretResult::Ok
+                    break InterpretResult::Ok;
                 }
                 OpCode::OpReturn => InterpretResult::Ok,
                 _ => InterpretResult::CompileError,
