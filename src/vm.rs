@@ -1,4 +1,4 @@
-use crate::chunk::{Chunk, OpCode};
+use crate::{chunk::{Chunk, OpCode}, debug::disassemble_instruction};
 
 pub enum InterpretResult {
     Ok,
@@ -27,8 +27,7 @@ impl<'a> VM<'a> {
         loop {
             #[cfg(feature = "debug_trace_execution")]
             {
-                print!("hola");
-                // disassemble_instruction(self.chunk.unwrap(), self.ip);
+                disassemble_instruction(self.chunk.unwrap(), self.ip);
             }
 
             let instruction = match self.read_byte() {
