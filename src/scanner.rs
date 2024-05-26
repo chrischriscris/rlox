@@ -24,11 +24,10 @@ impl<'a> Scanner<'a> {
         self.start = self.current;
 
         if self.is_at_end() {
-            return self.make_token(TokenType::TokenEof);
+            return self.make_token(TokenType::Eof);
         }
 
         let c = self.advance();
-
         if Self::is_alpha(*c) {
             return self.identifier();
         }
@@ -37,47 +36,47 @@ impl<'a> Scanner<'a> {
         }
 
         match c {
-            b'(' => return self.make_token(TokenType::TokenLeftParen),
-            b')' => return self.make_token(TokenType::TokenRightParen),
-            b'{' => return self.make_token(TokenType::TokenLeftBrace),
-            b'}' => return self.make_token(TokenType::TokenRightBrace),
-            b';' => return self.make_token(TokenType::TokenSemicolon),
-            b',' => return self.make_token(TokenType::TokenComma),
-            b'.' => return self.make_token(TokenType::TokenDot),
-            b'-' => return self.make_token(TokenType::TokenMinus),
-            b'+' => return self.make_token(TokenType::TokenPlus),
-            b'/' => return self.make_token(TokenType::TokenSlash),
-            b'*' => return self.make_token(TokenType::TokenStar),
+            b'(' => return self.make_token(TokenType::LeftParen),
+            b')' => return self.make_token(TokenType::RightParen),
+            b'{' => return self.make_token(TokenType::LeftBrace),
+            b'}' => return self.make_token(TokenType::RightBrace),
+            b';' => return self.make_token(TokenType::Semicolon),
+            b',' => return self.make_token(TokenType::Comma),
+            b'.' => return self.make_token(TokenType::Dot),
+            b'-' => return self.make_token(TokenType::Minus),
+            b'+' => return self.make_token(TokenType::Plus),
+            b'/' => return self.make_token(TokenType::Slash),
+            b'*' => return self.make_token(TokenType::Star),
 
             b'!' => {
                 return if self.match_char(b'=') {
-                    self.make_token(TokenType::TokenBangEqual)
+                    self.make_token(TokenType::BangEqual)
                 } else {
-                    self.make_token(TokenType::TokenBang)
+                    self.make_token(TokenType::Bang)
                 }
             }
 
             b'=' => {
                 return if self.match_char(b'=') {
-                    self.make_token(TokenType::TokenEqualEqual)
+                    self.make_token(TokenType::Equal)
                 } else {
-                    self.make_token(TokenType::TokenEqual)
+                    self.make_token(TokenType::Equal)
                 }
             }
 
             b'<' => {
                 return if self.match_char(b'=') {
-                    self.make_token(TokenType::TokenLessEqual)
+                    self.make_token(TokenType::LessEqual)
                 } else {
-                    self.make_token(TokenType::TokenLess)
+                    self.make_token(TokenType::Less)
                 }
             }
 
             b'>' => {
                 return if self.match_char(b'=') {
-                    self.make_token(TokenType::TokenGreaterEqual)
+                    self.make_token(TokenType::GreaterEqual)
                 } else {
-                    self.make_token(TokenType::TokenGreater)
+                    self.make_token(TokenType::Greater)
                 }
             }
 
@@ -108,7 +107,7 @@ impl<'a> Scanner<'a> {
     fn error_token(&self, message: &'a str) -> Token {
         // What to do with this? How to store the error message?
         Token::new(
-            TokenType::TokenError,
+            TokenType::Error,
             0,
             message.len(),
             message.as_bytes(),
@@ -177,16 +176,67 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    fn identifier_type() -> TokenType {
-        TokenType::TokenIdentifier
+    fn identifier_type(&self) -> TokenType {
+        return match &self.source[self.start] {
+            b'a' => self.check_keyword(1, 2, "nd", TokenType::And),
+            b'c' => self.check_keyword(1, 4, "lass", TokenType::Class),
+            b'e' => self.check_keyword(1, 3, "lse", TokenType::Else),
+            b'f' => {
+                if self.current - self.start > 1 {
+                    match &self.source[self.start + 1] {
+                        b'a' => self.check_keyword(2, 3, "lse", TokenType::False),
+                        b'o' => self.check_keyword(2, 1, "r", TokenType::For),
+                        b'u' => self.check_keyword(2, 1, "n", TokenType::Fun),
+                        _ => TokenType::Identifier,
+                    }
+                } else {
+                    TokenType::Identifier
+                }
+            }
+            b'i' => self.check_keyword(1, 1, "f", TokenType::If),
+            b'n' => self.check_keyword(1, 2, "il", TokenType::Nil),
+            b'o' => self.check_keyword(1, 1, "r", TokenType::Or),
+            b'p' => self.check_keyword(1, 4, "rint", TokenType::Print),
+            b'r' => self.check_keyword(1, 5, "eturn", TokenType::Return),
+            b's' => self.check_keyword(1, 4, "uper", TokenType::Super),
+            b't' => {
+                if self.current - self.start > 1 {
+                    match &self.source[self.start + 1] {
+                        b'h' => self.check_keyword(2, 2, "is", TokenType::This),
+                        b'r' => self.check_keyword(2, 2, "ue", TokenType::True),
+                        _ => TokenType::Identifier,
+                    }
+                } else {
+                    TokenType::Identifier
+                }
+            }
+            b'v' => self.check_keyword(1, 2, "ar", TokenType::Var),
+            b'w' => self.check_keyword(1, 4, "hile", TokenType::While),
+            _ => TokenType::Identifier,
+        };
     }
 
     fn is_alpha(c: u8) -> bool {
         return (c >= b'a' && c <= b'z') || (c >= b'A' && c <= b'Z') || c == b'_';
     }
-
     fn is_digit(c: u8) -> bool {
         c >= b'0' && c <= b'9'
+    }
+
+    fn check_keyword(
+        &self,
+        start: usize,
+        length: usize,
+        rest: &str,
+        token_type: TokenType,
+    ) -> TokenType {
+        if self.current - self.start == start + length
+            && &self.source[self.start + start..self.start + start + length] == rest.as_bytes()
+        {
+            return token_type;
+        }
+
+        TokenType::Identifier
     }
 
     fn string(&mut self) -> Token {
@@ -204,7 +254,7 @@ impl<'a> Scanner<'a> {
 
         // Consume the closing ".
         self.advance();
-        return self.make_token(TokenType::TokenString);
+        return self.make_token(TokenType::String);
     }
 
     fn number(&mut self) -> Token {
@@ -222,7 +272,7 @@ impl<'a> Scanner<'a> {
             }
         }
 
-        self.make_token(TokenType::TokenNumber)
+        self.make_token(TokenType::Number)
     }
 
     fn identifier(&mut self) -> Token {
@@ -230,6 +280,6 @@ impl<'a> Scanner<'a> {
             self.advance();
         }
 
-        self.make_token(Self::identifier_type())
+        self.make_token(self.identifier_type())
     }
 }
