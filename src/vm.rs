@@ -4,6 +4,15 @@ use crate::{
     value::{print_value, Value},
 };
 
+#[macro_export]
+macro_rules! binary_op {
+    ($vm:ident, $op:tt) => {{
+        let b = $vm.pop();
+        let a = $vm.pop();
+        $vm.push(a $op b);
+    }};
+}
+
 pub enum InterpretResult {
     Ok,
     CompileError,
@@ -59,10 +68,15 @@ impl<'a> VM<'a> {
                     let constant = self.read_constant();
                     self.push(constant);
                 }
+                OpCode::OpAdd => binary_op!(self, +),
+                OpCode::OpSubtract => binary_op!(self, -),
+                OpCode::OpMultiply => binary_op!(self, *),
+                OpCode::OpDivide => binary_op!(self, /),
                 OpCode::OpNegate => {
                     let val = -self.pop();
                     self.push(val);
                 }
+
                 OpCode::OpReturn => {
                     print_value(self.pop());
                     println!();

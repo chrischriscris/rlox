@@ -28,6 +28,10 @@ pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
 
     return match opcode.unwrap() {
         OpCode::OpConstant => constant_instruction("OpConstant", chunk, offset),
+        OpCode::OpAdd => simple_instruction("OpAdd", offset),
+        OpCode::OpSubtract => simple_instruction("OpSubtract", offset),
+        OpCode::OpMultiply => simple_instruction("OpMultiply", offset),
+        OpCode::OpDivide => simple_instruction("OpDivide", offset),
         OpCode::OpNegate => simple_instruction("OpNegate", offset),
         OpCode::OpReturn => simple_instruction("OpReturn", offset),
 

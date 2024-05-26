@@ -11,10 +11,22 @@ fn main() -> Result<(), ()> {
     let mut chunk = Chunk::new();
 
     let constant = chunk.add_constant(1.2);
-
     chunk.write_op_code(OpCode::OpConstant, 42);
     chunk.write(constant.try_into().unwrap(), 42);
+
+    let constant = chunk.add_constant(3.4);
+    chunk.write_op_code(OpCode::OpConstant, 42);
+    chunk.write(constant.try_into().unwrap(), 42);
+
+    chunk.write_op_code(OpCode::OpAdd, 42);
+
+    let constant = chunk.add_constant(5.6);
+    chunk.write_op_code(OpCode::OpConstant, 42);
+    chunk.write(constant.try_into().unwrap(), 42);
+
+    chunk.write_op_code(OpCode::OpDivide, 42);
     chunk.write_op_code(OpCode::OpNegate, 42);
+
     chunk.write_op_code(OpCode::OpReturn, 42);
 
     vm.interpret(&chunk);
