@@ -1,35 +1,57 @@
-use chunk::{Chunk, OpCode};
+use std::{env, fs, io, process};
+
 use vm::VM;
 
 mod chunk;
 mod debug;
 mod value;
 mod vm;
+mod compiler;
+mod scanner;
+mod token;
+
+fn repl() {
+    loop {
+        print!("> ");
+        let mut line = String::new();
+        io::stdin().read_line(&mut line).unwrap();
+        let line = line.trim();
+        if line.is_empty() {
+            break;
+        }
+
+        let mut vm = VM::new();
+        vm.interpret(line);
+    }
+}
+
+fn run_file(file: &str) -> Result<(), ()> {
+    let source = fs::read_to_string(file).map_err(|_| {
+        eprintln!("Could not read file '{}'", file);
+        process::exit(74);
+    });
+
+    let mut vm = VM::new();
+    vm.interpret(&source);
+
+    Ok(())
+}
 
 fn main() -> Result<(), ()> {
-    let mut vm = VM::new();
-    let mut chunk = Chunk::new();
-
-    let constant = chunk.add_constant(1.2);
-    chunk.write_op_code(OpCode::OpConstant, 42);
-    chunk.write(constant.try_into().unwrap(), 42);
-
-    let constant = chunk.add_constant(3.4);
-    chunk.write_op_code(OpCode::OpConstant, 42);
-    chunk.write(constant.try_into().unwrap(), 42);
-
-    chunk.write_op_code(OpCode::OpAdd, 42);
-
-    let constant = chunk.add_constant(5.6);
-    chunk.write_op_code(OpCode::OpConstant, 42);
-    chunk.write(constant.try_into().unwrap(), 42);
-
-    chunk.write_op_code(OpCode::OpDivide, 42);
-    chunk.write_op_code(OpCode::OpNegate, 42);
-
-    chunk.write_op_code(OpCode::OpReturn, 42);
-
-    vm.interpret(&chunk);
+    // Get arguments
+    let args: Vec<String> = env::args().collect();
+    let res = match args.len() {
+        1 => {
+            repl();
+        }
+        2 => {
+            run_file(&args[1])?;
+        }
+        _ => {
+            println!("Usage: rlox [script]");
+            process::exit(64);
+        }
+    };
 
     Ok(())
 }
