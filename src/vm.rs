@@ -40,12 +40,19 @@ impl<'a> VM<'a> {
     }
 
     pub fn interpret(&mut self, source: &str) -> InterpretResult {
-        compiler::compile(source);
-        InterpretResult::Ok
-        // self.chunk = Some(chunk);
-        // self.ip = 0;
+        match compiler::compile(source) {
+            Ok(chunk) => {
+                self.chunk = Some(&chunk);
+                self.ip = 0;
+                self.stack_top = 0;
 
-        // self.run()
+                let result = self.run();
+                self.chunk = None;
+
+                result
+            }
+            Err(_) => InterpretResult::CompileError,
+        }
     }
 
     fn run(&mut self) -> InterpretResult {

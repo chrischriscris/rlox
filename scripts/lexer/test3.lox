@@ -1,0 +1,11 @@
+/**/
+
+/**
+ * This is a multiline comment
+ *
+ * @param a int
+ * @param b int
+ */
+fun add(a /* int */, b /* int */) {
+    return a+b /* the result */;
+}

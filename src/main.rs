@@ -29,7 +29,7 @@ fn run_file(file: &str) -> Result<(), ()> {
     let source = fs::read_to_string(file).map_err(|_| {
         eprintln!("Could not read file '{}'", file);
         process::exit(74);
-    });
+    }).unwrap();
 
     let mut vm = VM::new();
     vm.interpret(&source);
@@ -52,6 +52,7 @@ fn main() -> Result<(), ()> {
             process::exit(64);
         }
     };
+
 
     Ok(())
 }

@@ -1,0 +1,35 @@
+print "Using for: ";
+
+var start = clock();
+var a = 0;
+var temp;
+for (var b = 1; a < 10000; b = temp + b) {
+ print a;
+ temp = a;
+ a = b;
+}
+var end = clock();
+
+print "Time: ";
+print end - start;
+print "";
+
+
+
+
+print "Using while:";
+
+var start = clock();
+var a = 0;
+var temp;
+var b = 1;
+while (a < 10000) {
+    print a;
+    temp = a;
+    a = b;
+    b = temp + b;
+}
+var end = clock();
+
+print "Time: ";
+print end - start;

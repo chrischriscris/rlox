@@ -58,7 +58,7 @@ impl<'a> Scanner<'a> {
 
             b'=' => {
                 return if self.match_char(b'=') {
-                    self.make_token(TokenType::Equal)
+                    self.make_token(TokenType::EqualEqual)
                 } else {
                     self.make_token(TokenType::Equal)
                 }

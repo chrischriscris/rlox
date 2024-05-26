@@ -1,0 +1,7 @@
+false == 5;
+7/2;
+7/22+1;
+"hola" +  " como estas";
+false;
+false < true;
+"gol"  + 1;
