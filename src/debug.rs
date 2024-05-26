@@ -28,6 +28,7 @@ pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
 
     return match opcode.unwrap() {
         OpCode::OpConstant => constant_instruction("OpConstant", chunk, offset),
+        OpCode::OpNegate => simple_instruction("OpNegate", offset),
         OpCode::OpReturn => simple_instruction("OpReturn", offset),
 
         // To allow adding new OpCodes without inmediately having to add them

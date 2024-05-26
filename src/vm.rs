@@ -1,4 +1,8 @@
-use crate::{chunk::{Chunk, OpCode}, debug::disassemble_instruction};
+use crate::{
+    chunk::{Chunk, OpCode},
+    debug::disassemble_instruction,
+    value::{print_value, Value},
+};
 
 pub enum InterpretResult {
     Ok,
@@ -6,14 +10,23 @@ pub enum InterpretResult {
     RuntimeError,
 }
 
+const STACK_MAX: usize = 256;
+
 pub struct VM<'a> {
     pub chunk: Option<&'a Chunk>,
     pub ip: usize,
+    pub stack: [Value; STACK_MAX],
+    pub stack_top: usize,
 }
 
 impl<'a> VM<'a> {
     pub fn new() -> Self {
-        VM { chunk: None, ip: 0 }
+        VM {
+            chunk: None,
+            ip: 0,
+            stack: [0.0; STACK_MAX],
+            stack_top: 0,
+        }
     }
 
     pub fn interpret(&mut self, chunk: &'a Chunk) -> InterpretResult {
@@ -27,6 +40,12 @@ impl<'a> VM<'a> {
         loop {
             #[cfg(feature = "debug_trace_execution")]
             {
+                print!("          ");
+                self.stack[..self.stack_top]
+                    .iter()
+                    .for_each(|&slot| print!("[{}]", slot));
+                println!();
+
                 disassemble_instruction(self.chunk.unwrap(), self.ip);
             }
 
@@ -35,15 +54,21 @@ impl<'a> VM<'a> {
                 None => return InterpretResult::Ok,
             };
 
-            return match instruction.unwrap() {
+            match instruction.unwrap() {
                 OpCode::OpConstant => {
                     let constant = self.read_constant();
-                    println!("{}", constant);
-
+                    self.push(constant);
+                }
+                OpCode::OpNegate => {
+                    let val = -self.pop();
+                    self.push(val);
+                }
+                OpCode::OpReturn => {
+                    print_value(self.pop());
+                    println!();
                     break InterpretResult::Ok;
                 }
-                OpCode::OpReturn => InterpretResult::Ok,
-                _ => InterpretResult::CompileError,
+                _ => break InterpretResult::CompileError,
             };
         }
     }
@@ -78,5 +103,18 @@ impl<'a> VM<'a> {
         } else {
             0.0
         }
+    }
+
+    // Operations over stack
+
+    fn push(&mut self, value: Value) {
+        self.stack[self.stack_top] = value;
+        self.stack_top += 1;
+    }
+
+    fn pop(&mut self) -> Value {
+        self.stack_top -= 1;
+
+        self.stack[self.stack_top]
     }
 }

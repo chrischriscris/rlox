@@ -1,5 +1,4 @@
 use chunk::{Chunk, OpCode};
-use debug::disassemble_chunk;
 use vm::VM;
 
 mod chunk;
@@ -15,9 +14,9 @@ fn main() -> Result<(), ()> {
 
     chunk.write_op_code(OpCode::OpConstant, 42);
     chunk.write(constant.try_into().unwrap(), 42);
+    chunk.write_op_code(OpCode::OpNegate, 42);
     chunk.write_op_code(OpCode::OpReturn, 42);
 
-    // disassemble_chunk(&chunk, "test chunk");
     vm.interpret(&chunk);
 
     Ok(())
