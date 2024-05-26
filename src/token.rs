@@ -49,22 +49,30 @@ pub enum TokenType {
     TokenEof,
 }
 
-pub struct Token {
+pub struct Token<'a> {
     token_type: TokenType,
 
     // Think about replacing this with a string slice
     start: usize,
     length: usize,
+    lexeme: &'a [u8],
 
     line: usize,
 }
 
-impl Token {
-    pub fn new(token_type: TokenType, start: usize, length: usize, line: usize) -> Self {
+impl<'a> Token<'a> {
+    pub fn new(
+        token_type: TokenType,
+        start: usize,
+        length: usize,
+        lexeme: &'a [u8],
+        line: usize,
+    ) -> Self {
         Token {
             token_type,
             start,
             length,
+            lexeme,
             line,
         }
     }
