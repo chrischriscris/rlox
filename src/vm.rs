@@ -22,14 +22,14 @@ pub enum InterpretResult {
 
 const STACK_MAX: usize = 256;
 
-pub struct VM<'a> {
-    pub chunk: Option<&'a Chunk>,
+pub struct VM {
+    pub chunk: Option<Chunk>,
     pub ip: usize,
     pub stack: [Value; STACK_MAX],
     pub stack_top: usize,
 }
 
-impl<'a> VM<'a> {
+impl VM {
     pub fn new() -> Self {
         VM {
             chunk: None,
@@ -42,12 +42,11 @@ impl<'a> VM<'a> {
     pub fn interpret(&mut self, source: &str) -> InterpretResult {
         match compiler::compile(source) {
             Ok(chunk) => {
-                self.chunk = Some(&chunk);
+                self.chunk = Some(chunk);
                 self.ip = 0;
                 self.stack_top = 0;
 
                 let result = self.run();
-                self.chunk = None;
 
                 result
             }
