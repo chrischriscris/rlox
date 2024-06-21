@@ -105,7 +105,7 @@ impl VM {
     /// - `Some(u8)` - The byte read from the code
     /// - `None` - If the instruction pointer is out of bounds
     fn read_byte(&mut self) -> Option<u8> {
-        let instruction = self.chunk.unwrap().code.get(self.ip).copied();
+        let instruction = self.chunk.as_ref().unwrap().code.get(self.ip).copied();
         if instruction.is_some() {
             self.ip += 1;
         }
@@ -121,7 +121,7 @@ impl VM {
     fn read_constant(&mut self) -> f64 {
         let index = self.read_byte().unwrap();
 
-        if let Some(chunk) = self.chunk {
+        if let Some(chunk) = &self.chunk {
             chunk.constants.values[index as usize]
         } else {
             0.0
